@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Blood Orange
+Copyright 2021 Liam Rathke/VMware
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,16 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package settings // import "github.com/bloodorangeio/octant-helm/pkg/plugin/settings"
+package settings // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/settings"
 
 import (
-	"github.com/bloodorangeio/octant-helm/pkg/plugin/actions"
 	"strings"
+
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/actions"
 
 	"github.com/vmware-tanzu/octant/pkg/navigation"
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 
-	"github.com/bloodorangeio/octant-helm/pkg/plugin/router"
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/router"
 )
 
 func GetOptions() []service.PluginOption {
@@ -37,13 +38,13 @@ func GetOptions() []service.PluginOption {
 					IconName: rootNavIcon,
 					Children: []navigation.Navigation{
 						{
-							Title: "Repositories",
-							Path: request.GeneratePath("repositories"),
+							Title:    "Repositories",
+							Path:     request.GeneratePath("repositories"),
 							IconName: "folder",
 						},
 						{
-							Title: "Environment",
-							Path: request.GeneratePath("environment"),
+							Title:    "Environment",
+							Path:     request.GeneratePath("environment"),
 							IconName: "cog",
 						},
 					},

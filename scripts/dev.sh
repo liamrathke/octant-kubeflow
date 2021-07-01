@@ -15,8 +15,8 @@ function log {
 
 function build_plugin {
   log "Building plugin..."
-  ( cd ${DIR}/../ && go build -o bin/octant-helm cmd/octant-helm/main.go )
-  log "Plugin built to bin/octant-helm"
+  ( cd ${DIR}/../ && go build -o bin/octant-kubeflow cmd/octant-kubeflow/main.go )
+  log "Plugin built to bin/octant-kubeflow"
 }
 
 function start_octant {

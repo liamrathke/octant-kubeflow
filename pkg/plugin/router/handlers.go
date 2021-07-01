@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Blood Orange
+Copyright 2021 Liam Rathke/VMware
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package router // import "github.com/bloodorangeio/octant-helm/pkg/plugin/router"
+package router // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/router"
 
 import (
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 
-	"github.com/bloodorangeio/octant-helm/pkg/plugin/views"
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 )
 
 func rootHandler(request service.Request) (component.ContentResponse, error) {

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package views // import "github.com/bloodorangeio/octant-helm/pkg/plugin/views"
+package views // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 
 import (
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"

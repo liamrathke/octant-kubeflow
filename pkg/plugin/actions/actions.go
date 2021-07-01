@@ -2,8 +2,9 @@ package actions
 
 import (
 	"fmt"
-	"github.com/bloodorangeio/octant-helm/pkg/config"
-	"github.com/bloodorangeio/octant-helm/pkg/helm"
+
+	"github.com/liamrathke/octant-kubeflow/pkg/config"
+	"github.com/liamrathke/octant-kubeflow/pkg/helm"
 	"github.com/vmware-tanzu/octant/pkg/action"
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/store"
@@ -13,8 +14,8 @@ import (
 )
 
 const (
-	UpdateHelmReleaseValues = "octant-helm.dev/update"
-	UninstallHelmReleaseAction = "octant-helm.dev/uninstall"
+	UpdateHelmReleaseValues    = "octant-kubeflow.dev/update"
+	UninstallHelmReleaseAction = "octant-kubeflow.dev/uninstall"
 )
 
 func ActionHandler(request *service.ActionRequest) error {
@@ -46,7 +47,7 @@ func ActionHandler(request *service.ActionRequest) error {
 		}
 		return updateReleaseValues(request, actionConfig, releaseValues, releaseName)
 	default:
-		return fmt.Errorf("unable to find handler for plugin: %s", "octant-helm")
+		return fmt.Errorf("unable to find handler for plugin: %s", "octant-kubeflow")
 	}
 }
 

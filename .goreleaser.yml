@@ -1,6 +1,6 @@
 builds:
-  - main: ./cmd/octant-helm
-    binary: ./octant-helm
+  - main: ./cmd/octant-kubeflow
+    binary: ./octant-kubeflow
     env:
       - CGO_ENABLED=0
     goos:
@@ -14,7 +14,7 @@ builds:
 
 archives:
   -
-    id: octant-helm
+    id: octant-kubeflow
     format: tar.gz
     files:
       - LICENSE

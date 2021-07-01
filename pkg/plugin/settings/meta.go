@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Blood Orange
+Copyright 2021 Liam Rathke/VMware
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package settings // import "github.com/bloodorangeio/octant-helm/pkg/plugin/settings"
+package settings // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/settings"
 
 const (
-	name        = "helm" // This should stay lowercase for routing purposes
-	description = "Helm support (v3)"
-	rootNavIcon = "boat" // See https://clarity.design/icons for all options
+	name        = "kubeflow" // This should stay lowercase for routing purposes
+	description = "Octant Kubeflow"
+	rootNavIcon = "node-group" // See https://clarity.design/icons for all options
 )
 
 func GetName() string {

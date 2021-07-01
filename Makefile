@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 
-PLUGIN_NAME=octant-helm
+PLUGIN_NAME=octant-kubeflow
 
 ifdef XDG_CONFIG_HOME
 	OCTANT_PLUGIN_DIR ?= ${XDG_CONFIG_HOME}/octant/plugins
@@ -12,7 +12,7 @@ endif
 
 .PHONY: build
 build:
-	@go build -o bin/$(PLUGIN_NAME) cmd/octant-helm/main.go
+	@go build -o bin/$(PLUGIN_NAME) cmd/octant-kubeflow/main.go
 	@cp bin/$(PLUGIN_NAME) $(OCTANT_PLUGIN_DIR)/$(PLUGIN_NAME)
 
 .PHONY: dev

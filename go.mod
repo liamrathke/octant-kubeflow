@@ -1,4 +1,4 @@
-module github.com/bloodorangeio/octant-helm
+module github.com/liamrathke/octant-kubeflow
 
 go 1.13
 

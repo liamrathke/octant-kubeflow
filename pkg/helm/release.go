@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Blood Orange
+Copyright 2021 Liam Rathke/VMware
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package helm // import "github.com/bloodorangeio/octant-helm/pkg/helm"
+package helm // import "github.com/liamrathke/octant-kubeflow/pkg/helm"
 
 import (
 	"bytes"
@@ -28,7 +28,7 @@ import (
 	"strings"
 
 	rspb "helm.sh/helm/v3/pkg/release"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 

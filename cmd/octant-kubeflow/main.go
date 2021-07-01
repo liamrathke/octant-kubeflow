@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Blood Orange
+Copyright 2021 Liam Rathke/VMware
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main // import "github.com/bloodorangeio/octant-helm/cmd/octant-helm"
+package main // import "github.com/liamrathke/octant-kubeflow/cmd/octant-kubeflow"
 
 import (
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 
-	"github.com/bloodorangeio/octant-helm/pkg/plugin/settings"
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/settings"
 )
 
 func main() {

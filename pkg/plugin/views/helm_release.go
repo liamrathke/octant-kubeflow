@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Blood Orange
+Copyright 2021 Liam Rathke/VMware
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,13 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package views // import "github.com/bloodorangeio/octant-helm/pkg/plugin/views"
+package views // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 
 import (
 	"fmt"
-	"github.com/bloodorangeio/octant-helm/pkg/config"
-	"github.com/bloodorangeio/octant-helm/pkg/plugin/actions"
+
+	"github.com/liamrathke/octant-kubeflow/pkg/config"
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/actions"
 	helmAction "helm.sh/helm/v3/pkg/action"
+
 	//"helm.sh/helm/v3/pkg/chartutil"
 	"sigs.k8s.io/yaml"
 
@@ -35,7 +37,7 @@ import (
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 	"k8s.io/apimachinery/pkg/labels"
 
-	"github.com/bloodorangeio/octant-helm/pkg/helm"
+	"github.com/liamrathke/octant-kubeflow/pkg/helm"
 )
 
 func BuildHelmReleaseViewForRequest(request service.Request) (component.Component, []component.TitleComponent, error) {
@@ -87,7 +89,7 @@ func BuildHelmReleaseViewForRequest(request service.Request) (component.Componen
 	}
 	historyColumns := component.NewTableCols("Revision", "Updated", "Status", "Chart", "App Version", "Description")
 	historyTable := component.NewTable("History", "There is no history!", historyColumns)
-	for i := len(history)-1; i >= 0; i-- {
+	for i := len(history) - 1; i >= 0; i-- {
 		var appVersion string
 		h := history[i]
 		if h.Chart.Metadata != nil {
@@ -137,7 +139,6 @@ func BuildHelmReleaseViewForValues(request service.Request) (component.Component
 	if r == nil {
 		return component.NewText("Error: release not found"), nil
 	}
-
 
 	actionConfig, err := config.NewActionConfig(request.ClientState().Namespace)
 	if err != nil {

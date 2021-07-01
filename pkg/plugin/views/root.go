@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Blood Orange
+Copyright 2021 Liam Rathke/VMware
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,20 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package views // import "github.com/bloodorangeio/octant-helm/pkg/plugin/views"
+package views // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 
 import (
 	"fmt"
-	"github.com/bloodorangeio/octant-helm/pkg/plugin/actions"
-	"github.com/vmware-tanzu/octant/pkg/action"
 	"strconv"
+
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/actions"
+	"github.com/vmware-tanzu/octant/pkg/action"
 
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/store"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 	"k8s.io/apimachinery/pkg/labels"
 
-	"github.com/bloodorangeio/octant-helm/pkg/helm"
+	"github.com/liamrathke/octant-kubeflow/pkg/helm"
 )
 
 func BuildRootViewForRequest(request service.Request) (component.Component, error) {
