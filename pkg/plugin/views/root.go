@@ -18,24 +18,18 @@ package views // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 
 import (
 	"fmt"
-	"strconv"
-
-	"github.com/liamrathke/octant-kubeflow/pkg/plugin/actions"
-	"github.com/vmware-tanzu/octant/pkg/action"
 
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/store"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 	"k8s.io/apimachinery/pkg/labels"
-
-	"github.com/liamrathke/octant-kubeflow/pkg/helm"
 )
 
 func BuildRootViewForRequest(request service.Request) (component.Component, error) {
 	ctx := request.Context()
 	client := request.DashboardClient()
 
-	ul, err := client.List(ctx, store.Key{
+	_, err := client.List(ctx, store.Key{
 		APIVersion: "v1",
 		Kind:       "Secret",
 		Selector: &labels.Set{
@@ -47,47 +41,11 @@ func BuildRootViewForRequest(request service.Request) (component.Component, erro
 		return nil, err
 	}
 
-	helmReleases := helm.UnstructuredListToHelmReleaseList(ul)
+	header := component.NewMarkdownText(fmt.Sprintf("## Kubeflow"))
 
-	header := component.NewMarkdownText(fmt.Sprintf("## Helm"))
-
-	table := component.NewTableWithRows(
-		"Releases", "There are no Helm releases!",
-		component.NewTableCols("Name", "Namespace", "Revision", "Updated", "Status", "Chart", "App Version"),
-		[]component.TableRow{})
-
-	for _, r := range helmReleases {
-		tr := component.TableRow{
-			"Name":      component.NewLink(r.Name, r.Name, r.Name),
-			"Namespace": component.NewText(r.Namespace),
-			"Revision":  component.NewText(strconv.Itoa(r.Version)),
-			"Status":    component.NewText(r.Info.Status.String()),
-			"Chart": component.NewText(
-				fmt.Sprintf("%s-%s", r.Chart.Metadata.Name, r.Chart.Metadata.Version)),
-			"App Version": component.NewText(r.Chart.Metadata.AppVersion),
-		}
-		tr["Updated"] = component.NewTimestamp(r.Info.LastDeployed.Time)
-		tr.AddAction(component.GridAction{
-			Name:       "Uninstall",
-			ActionPath: actions.UninstallHelmReleaseAction,
-			Payload: action.Payload{
-				"releaseName": r.Name,
-			},
-			Confirmation: &component.Confirmation{
-				Title: "Uninstall Helm Release - " + r.Name,
-				Body:  "Are you sure you want to uninstall?",
-			},
-			Type: "",
-		})
-		table.Add(tr)
-	}
-
-	table.Sort("Name")
-
-	flexLayout := component.NewFlexLayout("")
+	flexLayout := component.NewFlexLayout("Home")
 	flexLayout.AddSections(component.FlexLayoutSection{
 		{Width: component.WidthFull, View: header},
-		{Width: component.WidthFull, View: table},
 	})
 
 	return flexLayout, nil

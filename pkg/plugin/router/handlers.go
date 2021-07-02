@@ -32,38 +32,3 @@ func rootHandler(request service.Request) (component.ContentResponse, error) {
 	response.Add(rootView)
 	return *response, nil
 }
-
-func helmReleaseHandler(request service.Request) (component.ContentResponse, error) {
-	helmReleaseView, title, err := views.BuildHelmReleaseViewForRequest(request)
-	if err != nil {
-		return component.EmptyContentResponse, err
-	}
-	helmEditorView, err := views.BuildHelmReleaseViewForValues(request)
-	if err != nil {
-		return component.EmptyContentResponse, err
-	}
-
-	response := component.NewContentResponse(title)
-	response.Add(helmReleaseView, helmEditorView)
-	return *response, nil
-}
-
-func helmRepoHandler(request service.Request) (component.ContentResponse, error) {
-	repoView, err := views.BuildRepoViewForRequest(request)
-	if err != nil {
-		return component.EmptyContentResponse, err
-	}
-	response := component.NewContentResponse(nil)
-	response.Add(repoView)
-	return *response, nil
-}
-
-func helmEnvironmentHandler(request service.Request) (component.ContentResponse, error) {
-	envView, err := views.BuildHelmEnvViewForRequest(request)
-	if err != nil {
-		return component.EmptyContentResponse, err
-	}
-	response := component.NewContentResponse(nil)
-	response.Add(envView)
-	return *response, nil
-}

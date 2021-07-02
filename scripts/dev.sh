@@ -22,7 +22,7 @@ function build_plugin {
 function start_octant {
   local extra_args="$@"
   log "Starting Octant..."
-  octant --plugin-path=${DIR}/../bin/ ${extra_args} &
+  octant --disable-open-browser --plugin-path=${DIR}/../bin/ ${extra_args} &
   log "Octant available at http://127.0.0.1:7777/"
 }
 

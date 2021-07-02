@@ -38,14 +38,9 @@ func GetOptions() []service.PluginOption {
 					IconName: rootNavIcon,
 					Children: []navigation.Navigation{
 						{
-							Title:    "Repositories",
-							Path:     request.GeneratePath("repositories"),
-							IconName: "folder",
-						},
-						{
-							Title:    "Environment",
-							Path:     request.GeneratePath("environment"),
-							IconName: "cog",
+							Title:    "Home",
+							Path:     request.GeneratePath(""),
+							IconName: "home",
 						},
 					},
 				}, nil
