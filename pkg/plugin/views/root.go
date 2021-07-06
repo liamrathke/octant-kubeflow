@@ -17,12 +17,12 @@ limitations under the License.
 package views // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 
 import (
-	"fmt"
-
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/store"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 	"k8s.io/apimachinery/pkg/labels"
+
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/views/root"
 )
 
 func BuildRootViewForRequest(request service.Request) (component.Component, error) {
@@ -33,7 +33,7 @@ func BuildRootViewForRequest(request service.Request) (component.Component, erro
 		APIVersion: "v1",
 		Kind:       "Secret",
 		Selector: &labels.Set{
-			"owner": "helm",
+			"owner": "kubeflow",
 		},
 	})
 
@@ -41,11 +41,11 @@ func BuildRootViewForRequest(request service.Request) (component.Component, erro
 		return nil, err
 	}
 
-	header := component.NewMarkdownText(fmt.Sprintf("## Kubeflow"))
+	status := root.BuildStatusTable()
 
 	flexLayout := component.NewFlexLayout("Home")
 	flexLayout.AddSections(component.FlexLayoutSection{
-		{Width: component.WidthFull, View: header},
+		{Width: component.WidthHalf, View: status},
 	})
 
 	return flexLayout, nil
