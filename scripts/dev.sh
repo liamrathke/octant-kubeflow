@@ -9,6 +9,15 @@ REQUIRED_SYSTEM_COMMANDS=(
   "fswatch"
 )
 
+function run_octant {
+  local extra_args="$@"
+  octant --plugin-path=${DIR}/../bin/ ${extra_args}
+}
+
+function run_octant_local {
+  (cd $HOME/work/octant && ls && OCTANT_DISABLE_OPEN_BROWSER=true OCTANT_PLUGIN_PATH=${DIR}/../bin/ go run build.go serve)
+}
+
 function log {
   echo "[dev.sh] $@"
 }
@@ -22,13 +31,13 @@ function build_plugin {
 function start_octant {
   local extra_args="$@"
   log "Starting Octant..."
-  octant --disable-open-browser --plugin-path=${DIR}/../bin/ ${extra_args} &
+  run_octant_local &
   log "Octant available at http://127.0.0.1:7777/"
 }
 
 function stop_octant {
   log "Stopping Octant..."
-  pkill -9 octant || true
+  pkill -9 octant && kill -9 $(lsof -t -i:7777 && lsof -t -i:4200) || true
 }
 
 function watch_files {

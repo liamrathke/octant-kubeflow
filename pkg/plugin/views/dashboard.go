@@ -39,7 +39,7 @@ func BuildDashboardViewForRequest(request service.Request) (component.Component,
 		return nil, err
 	}
 
-	dashboard := component.NewIFrame("http://localhost:9999", "Kubeflow Central Dashboard")
+	dashboard := component.NewIFrame("http://localhost:9999", "")
 
 	return dashboard, nil
 }
