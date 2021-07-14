@@ -42,6 +42,11 @@ func GetOptions() []service.PluginOption {
 							Path:     request.GeneratePath(""),
 							IconName: "home",
 						},
+						{
+							Title:    "Central Dashboard",
+							Path:     request.GeneratePath("/dashboard"),
+							IconName: "dashboard",
+						},
 					},
 				}, nil
 			},

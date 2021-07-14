@@ -22,4 +22,5 @@ import (
 
 func InitRoutes(router *service.Router) {
 	router.HandleFunc("", rootHandler)
+	router.HandleFunc("/dashboard", dashboardHandler)
 }

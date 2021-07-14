@@ -32,3 +32,13 @@ func rootHandler(request service.Request) (component.ContentResponse, error) {
 	response.Add(rootView)
 	return *response, nil
 }
+
+func dashboardHandler(request service.Request) (component.ContentResponse, error) {
+	dashboardView, err := views.BuildDashboardViewForRequest(request)
+	if err != nil {
+		return component.EmptyContentResponse, err
+	}
+	response := component.NewContentResponse(nil)
+	response.Add(dashboardView)
+	return *response, nil
+}
