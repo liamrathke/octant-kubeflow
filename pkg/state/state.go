@@ -14,25 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main // import "github.com/liamrathke/octant-kubeflow/cmd/octant-kubeflow"
+package state // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/state"
 
-import (
-	"github.com/vmware-tanzu/octant/pkg/plugin/service"
+var state State
 
-	"github.com/liamrathke/octant-kubeflow/pkg/plugin/settings"
-	"github.com/liamrathke/octant-kubeflow/pkg/state"
-)
+type State struct {
+	Dashboard Dashboard
+}
 
-func main() {
-	state.NewState()
+type Dashboard struct {
+	IsPortForwarded bool
+	Port            uint16
+}
 
-	name := settings.GetName()
-	description := settings.GetDescription()
-	capabilities := settings.GetCapabilities()
-	options := settings.GetOptions()
-	plugin, err := service.Register(name, description, capabilities, options...)
-	if err != nil {
-		panic(err)
+func NewState() {
+	state = State{
+		Dashboard: Dashboard{},
 	}
-	plugin.Serve()
+}
+
+func GetState() *State {
+	return &state
 }

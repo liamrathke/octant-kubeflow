@@ -19,6 +19,7 @@ package views // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 import (
 	"fmt"
 
+	"github.com/liamrathke/octant-kubeflow/pkg/state"
 	"github.com/vmware-tanzu/octant/pkg/plugin/api"
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/store"
@@ -28,11 +29,13 @@ import (
 	"context"
 )
 
+const DASHBOARD_PORT = 8080
+
 func BuildDashboardViewForRequest(request service.Request) (component.Component, error) {
-	context := request.Context()
+	ctx := request.Context()
 	client := request.DashboardClient()
 
-	_, err := client.List(context, store.Key{
+	_, err := client.List(ctx, store.Key{
 		APIVersion: "v1",
 		Kind:       "Secret",
 		Selector: &labels.Set{
@@ -52,8 +55,8 @@ func BuildDashboardViewForRequest(request service.Request) (component.Component,
 	dashboardPort, err := getDashboardPort()
 	if err != nil {
 		return nil, err
-	} else if dashboardPort < 0 {
-		dashboardPort, err = dashboardPortForward(client, context)
+	} else if dashboardPort == 0 {
+		dashboardPort, err = dashboardPortForward(client, ctx)
 	}
 
 	dashboardURL := fmt.Sprintf("http://localhost:%d", dashboardPort)
@@ -62,21 +65,32 @@ func BuildDashboardViewForRequest(request service.Request) (component.Component,
 	return dashboard, err
 }
 
-func getDashboardPort() (int, error) {
-	return -1, nil
+func getDashboardPort() (uint16, error) {
+	state := state.GetState()
+	if state.Dashboard.IsPortForwarded {
+		return state.Dashboard.Port, nil
+	}
+
+	return 0, nil
 }
 
-func dashboardPortForward(client service.Dashboard, context context.Context) (int, error) {
+func dashboardPortForward(client service.Dashboard, ctx context.Context) (uint16, error) {
 	request := api.PortForwardRequest{
 		Namespace: "istio-system",
 		PodName:   "istio-ingressgateway-56d9b7fdb-krwjh",
-		Port:      8080,
+		Port:      DASHBOARD_PORT,
 	}
 
-	response, err := client.PortForward(context, request)
+	response, err := client.PortForward(ctx, request)
 	if err != nil {
-		return -1, err
+		return 0, err
 	}
 
-	return int(response.Port), nil
+	port := response.Port
+
+	state := state.GetState()
+	state.Dashboard.IsPortForwarded = true
+	state.Dashboard.Port = port
+
+	return port, nil
 }
