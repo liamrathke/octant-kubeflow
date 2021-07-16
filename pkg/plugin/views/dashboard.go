@@ -17,9 +17,12 @@ limitations under the License.
 package views // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 
 import (
+	"errors"
 	"fmt"
 
+	"github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
 	"github.com/liamrathke/octant-kubeflow/pkg/state"
+
 	"github.com/vmware-tanzu/octant/pkg/plugin/api"
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/store"
@@ -47,11 +50,6 @@ func BuildDashboardViewForRequest(request service.Request) (component.Component,
 		return nil, err
 	}
 
-	// change namespace to istio-system
-	// get list of port forwards
-	// if istio-ingressgateway is port forwarded, use that port
-	// otherwise, forward the port and use it
-
 	dashboardPort, err := getDashboardPort()
 	if err != nil {
 		return nil, err
@@ -75,9 +73,16 @@ func getDashboardPort() (uint16, error) {
 }
 
 func dashboardPortForward(client service.Dashboard, ctx context.Context) (uint16, error) {
+	dashboardPodInfo, err := kubeflow.GetDashboardPod(client, ctx)
+	if err != nil {
+		return 0, err
+	} else if !dashboardPodInfo.Found {
+		return 0, errors.New("Dashboard pod could not be found")
+	}
+
 	request := api.PortForwardRequest{
-		Namespace: "istio-system",
-		PodName:   "istio-ingressgateway-56d9b7fdb-krwjh",
+		Namespace: dashboardPodInfo.Namespace,
+		PodName:   dashboardPodInfo.PodName,
 		Port:      DASHBOARD_PORT,
 	}
 

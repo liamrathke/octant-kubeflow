@@ -55,8 +55,8 @@ function main {
     fi
   done
 
-  build_plugin
   stop_octant
+  build_plugin
   start_octant
 
   trap "log \"Goodbye\"" EXIT

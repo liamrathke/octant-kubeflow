@@ -28,8 +28,9 @@ import (
 )
 
 type PodInfo struct {
-	Found   bool
-	PodName string
+	Found     bool
+	Namespace string
+	PodName   string
 }
 
 type PodSpec struct {
@@ -42,8 +43,8 @@ var DASHBOARD_POD_SPEC = PodSpec{
 	PodNameContains: "istio-ingressgateway",
 }
 
-func GetDashboardPod(client service.Dashboard) (PodInfo, error) {
-	return GetPodInfo(client, nil, DASHBOARD_POD_SPEC)
+func GetDashboardPod(client service.Dashboard, ctx context.Context) (PodInfo, error) {
+	return GetPodInfo(client, ctx, DASHBOARD_POD_SPEC)
 }
 
 func GetPodInfo(client service.Dashboard, ctx context.Context, podSpec PodSpec) (PodInfo, error) {
@@ -66,7 +67,11 @@ func GetPodInfo(client service.Dashboard, ctx context.Context, podSpec PodSpec) 
 		isValidPodName := strings.Contains(pod.Name, podSpec.PodNameContains)
 		isRunningPod := pod.Status.Phase == corev1.PodRunning
 		if isValidPodName && isRunningPod {
-			return PodInfo{Found: true, PodName: pod.Name}, nil
+			return PodInfo{
+				Found:     true,
+				Namespace: podSpec.Namespace,
+				PodName:   pod.Name,
+			}, nil
 		}
 	}
 
