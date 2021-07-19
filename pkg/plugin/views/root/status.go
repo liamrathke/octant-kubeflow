@@ -20,15 +20,16 @@ import (
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 
 	"github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
 )
 
-func BuildStatusTable() *component.Table {
+func BuildStatusTable(cc utilities.ClientContext) *component.Table {
 	table := component.NewTableWithRows(
 		"Status", "No Kubeflow services found!",
 		component.NewTableCols("Service", "Status"),
 		[]component.TableRow{})
 
-	for _, s := range kubeflow.GetStatus() {
+	for _, s := range kubeflow.GetStatus(cc) {
 		tr := component.TableRow{
 			"Service": component.NewText(s.ServiceName),
 		}

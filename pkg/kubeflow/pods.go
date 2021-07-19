@@ -48,22 +48,12 @@ func GetDashboardPod(cc utilities.ClientContext) (PodInfo, error) {
 }
 
 func GetPodInfo(cc utilities.ClientContext, podSpec PodSpec) (PodInfo, error) {
-	unstructuredPods, err := cc.List(store.Key{
-		APIVersion: "v1",
-		Kind:       "Pod",
-		Namespace:  podSpec.Namespace,
-	})
+	pods, err := GetPodsInNamespace(cc, podSpec.Namespace)
 	if err != nil {
-		return PodInfo{}, err
+		return PodInfo{}, nil
 	}
 
-	var podList corev1.PodList
-	err = runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredPods.UnstructuredContent(), &podList)
-	if err != nil {
-		return PodInfo{}, err
-	}
-
-	for _, pod := range podList.Items {
+	for _, pod := range pods {
 		isValidPodName := strings.Contains(pod.Name, podSpec.PodNameContains)
 		isRunningPod := pod.Status.Phase == corev1.PodRunning
 		if isValidPodName && isRunningPod {
@@ -76,4 +66,23 @@ func GetPodInfo(cc utilities.ClientContext, podSpec PodSpec) (PodInfo, error) {
 	}
 
 	return PodInfo{}, nil
+}
+
+func GetPodsInNamespace(cc utilities.ClientContext, namespace string) ([]corev1.Pod, error) {
+	unstructuredPods, err := cc.List(store.Key{
+		APIVersion: "v1",
+		Kind:       "Pod",
+		Namespace:  namespace,
+	})
+	if err != nil {
+		return []corev1.Pod{}, err
+	}
+
+	var podList corev1.PodList
+	err = runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredPods.UnstructuredContent(), &podList)
+	if err != nil {
+		return []corev1.Pod{}, err
+	}
+
+	return podList.Items, nil
 }

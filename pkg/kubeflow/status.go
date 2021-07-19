@@ -43,7 +43,7 @@ var COMPONENTS = []ComponentStatus{
 	{Name: "Kubeflow Example", Namespace: "kubeflow-user-example-com"},
 }
 
-func GetStatus() []KubeflowStatus {
+func GetStatus(cc utilities.ClientContext) []KubeflowStatus {
 	return []KubeflowStatus{
 		{ServiceName: "Test1", OK: true},
 		{ServiceName: "Test2", OK: true},
