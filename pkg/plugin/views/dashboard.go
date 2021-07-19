@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
 	"github.com/liamrathke/octant-kubeflow/pkg/state"
 
 	"github.com/vmware-tanzu/octant/pkg/plugin/api"
@@ -28,17 +29,14 @@ import (
 	"github.com/vmware-tanzu/octant/pkg/store"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 	"k8s.io/apimachinery/pkg/labels"
-
-	"context"
 )
 
 const DASHBOARD_PORT = 8080
 
 func BuildDashboardViewForRequest(request service.Request) (component.Component, error) {
-	ctx := request.Context()
-	client := request.DashboardClient()
+	cc := utilities.ClientContext{Client: request.DashboardClient(), Context: request.Context()}
 
-	_, err := client.List(ctx, store.Key{
+	_, err := cc.List(store.Key{
 		APIVersion: "v1",
 		Kind:       "Secret",
 		Selector: &labels.Set{
@@ -54,7 +52,7 @@ func BuildDashboardViewForRequest(request service.Request) (component.Component,
 	if err != nil {
 		return nil, err
 	} else if dashboardPort == 0 {
-		dashboardPort, err = dashboardPortForward(client, ctx)
+		dashboardPort, err = dashboardPortForward(cc)
 	}
 
 	dashboardURL := fmt.Sprintf("http://localhost:%d", dashboardPort)
@@ -72,8 +70,8 @@ func getDashboardPort() (uint16, error) {
 	return 0, nil
 }
 
-func dashboardPortForward(client service.Dashboard, ctx context.Context) (uint16, error) {
-	dashboardPodInfo, err := kubeflow.GetDashboardPod(client, ctx)
+func dashboardPortForward(cc utilities.ClientContext) (uint16, error) {
+	dashboardPodInfo, err := kubeflow.GetDashboardPod(cc)
 	if err != nil {
 		return 0, err
 	} else if !dashboardPodInfo.Found {
@@ -86,7 +84,7 @@ func dashboardPortForward(client service.Dashboard, ctx context.Context) (uint16
 		Port:      DASHBOARD_PORT,
 	}
 
-	response, err := client.PortForward(ctx, request)
+	response, err := cc.PortForward(request)
 	if err != nil {
 		return 0, err
 	}

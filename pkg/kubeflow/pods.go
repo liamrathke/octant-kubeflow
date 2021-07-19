@@ -17,14 +17,14 @@ limitations under the License.
 package kubeflow // import "github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
 
 import (
-	"context"
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/store"
+
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
 )
 
 type PodInfo struct {
@@ -43,12 +43,12 @@ var DASHBOARD_POD_SPEC = PodSpec{
 	PodNameContains: "istio-ingressgateway",
 }
 
-func GetDashboardPod(client service.Dashboard, ctx context.Context) (PodInfo, error) {
-	return GetPodInfo(client, ctx, DASHBOARD_POD_SPEC)
+func GetDashboardPod(cc utilities.ClientContext) (PodInfo, error) {
+	return GetPodInfo(cc, DASHBOARD_POD_SPEC)
 }
 
-func GetPodInfo(client service.Dashboard, ctx context.Context, podSpec PodSpec) (PodInfo, error) {
-	unstructuredPods, err := client.List(ctx, store.Key{
+func GetPodInfo(cc utilities.ClientContext, podSpec PodSpec) (PodInfo, error) {
+	unstructuredPods, err := cc.List(store.Key{
 		APIVersion: "v1",
 		Kind:       "Pod",
 		Namespace:  podSpec.Namespace,

@@ -16,9 +16,31 @@ limitations under the License.
 
 package kubeflow // import "github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
 
+import (
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
+)
+
 type KubeflowStatus struct {
 	ServiceName string
 	OK          bool
+}
+
+type ComponentStatus struct {
+	Name        string
+	Namespace   string
+	TotalPods   int
+	ReadyPods   int
+	RunningPods int
+}
+
+var COMPONENTS = []ComponentStatus{
+	{Name: "Certificate Manager", Namespace: "cert-manager"},
+	{Name: "Istio (System)", Namespace: "istio-system"},
+	{Name: "Auth", Namespace: "auth"},
+	{Name: "Knative (Eventing)", Namespace: "knative-eventing"},
+	{Name: "Knative (Serving)", Namespace: "knative-serving"},
+	{Name: "Kubeflow", Namespace: "kubeflow"},
+	{Name: "Kubeflow Example", Namespace: "kubeflow-user-example-com"},
 }
 
 func GetStatus() []KubeflowStatus {
@@ -28,4 +50,8 @@ func GetStatus() []KubeflowStatus {
 		{ServiceName: "Test3", OK: true},
 		{ServiceName: "Test4", OK: true},
 	}
+}
+
+func statusForComponent(cc utilities.ClientContext, component ComponentStatus) ComponentStatus {
+	return ComponentStatus{}
 }

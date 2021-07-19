@@ -17,10 +17,9 @@ limitations under the License.
 package router // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/router"
 
 import (
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
-
-	"github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 )
 
 func rootHandler(request service.Request) (component.ContentResponse, error) {
