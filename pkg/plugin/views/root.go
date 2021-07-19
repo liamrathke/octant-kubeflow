@@ -22,14 +22,14 @@ import (
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 	"k8s.io/apimachinery/pkg/labels"
 
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/views/root"
 )
 
 func BuildRootViewForRequest(request service.Request) (component.Component, error) {
-	ctx := request.Context()
-	client := request.DashboardClient()
+	cc := utilities.ClientContext{Client: request.DashboardClient(), Context: request.Context()}
 
-	_, err := client.List(ctx, store.Key{
+	_, err := cc.List(store.Key{
 		APIVersion: "v1",
 		Kind:       "Secret",
 		Selector: &labels.Set{
