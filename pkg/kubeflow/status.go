@@ -18,12 +18,8 @@ package kubeflow // import "github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
 
 import (
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
+	corev1 "k8s.io/api/core/v1"
 )
-
-type KubeflowStatus struct {
-	ServiceName string
-	OK          bool
-}
 
 type ComponentStatus struct {
 	Name        string
@@ -40,18 +36,35 @@ var COMPONENTS = []ComponentStatus{
 	{Name: "Knative (Eventing)", Namespace: "knative-eventing"},
 	{Name: "Knative (Serving)", Namespace: "knative-serving"},
 	{Name: "Kubeflow", Namespace: "kubeflow"},
-	{Name: "Kubeflow Example", Namespace: "kubeflow-user-example-com"},
 }
 
-func GetStatus(cc utilities.ClientContext) []KubeflowStatus {
-	return []KubeflowStatus{
-		{ServiceName: "Test1", OK: true},
-		{ServiceName: "Test2", OK: true},
-		{ServiceName: "Test3", OK: true},
-		{ServiceName: "Test4", OK: true},
+func GetStatus(cc utilities.ClientContext) []ComponentStatus {
+	statuses := make([]ComponentStatus, len(COMPONENTS))
+
+	for c := range COMPONENTS {
+		statuses[c], _ = getStatusForComponent(cc, COMPONENTS[c])
 	}
+
+	return statuses
 }
 
-func statusForComponent(cc utilities.ClientContext, component ComponentStatus) ComponentStatus {
-	return ComponentStatus{}
+func getStatusForComponent(cc utilities.ClientContext, component ComponentStatus) (ComponentStatus, error) {
+	pods, err := getPodsInNamespace(cc, component.Namespace)
+	if err != nil {
+		return ComponentStatus{}, err
+	}
+
+	for _, pod := range pods {
+		component.TotalPods++
+
+		if true { // fix!
+			component.ReadyPods++
+		}
+
+		if pod.Status.Phase == corev1.PodRunning {
+			component.RunningPods++
+		}
+	}
+
+	return component, err
 }

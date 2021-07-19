@@ -48,7 +48,7 @@ func GetDashboardPod(cc utilities.ClientContext) (PodInfo, error) {
 }
 
 func GetPodInfo(cc utilities.ClientContext, podSpec PodSpec) (PodInfo, error) {
-	pods, err := GetPodsInNamespace(cc, podSpec.Namespace)
+	pods, err := getPodsInNamespace(cc, podSpec.Namespace)
 	if err != nil {
 		return PodInfo{}, nil
 	}
@@ -68,7 +68,7 @@ func GetPodInfo(cc utilities.ClientContext, podSpec PodSpec) (PodInfo, error) {
 	return PodInfo{}, nil
 }
 
-func GetPodsInNamespace(cc utilities.ClientContext, namespace string) ([]corev1.Pod, error) {
+func getPodsInNamespace(cc utilities.ClientContext, namespace string) ([]corev1.Pod, error) {
 	unstructuredPods, err := cc.List(store.Key{
 		APIVersion: "v1",
 		Kind:       "Pod",
