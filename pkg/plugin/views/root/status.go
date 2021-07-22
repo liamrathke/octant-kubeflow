@@ -17,8 +17,6 @@ limitations under the License.
 package root // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views/root"
 
 import (
-	"fmt"
-
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 
 	"github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
@@ -26,24 +24,23 @@ import (
 )
 
 const (
-	COMPONENT = "Kubeflow Component"
-	READY     = "Ready Pods"
-	RUNNING   = "Running Pods"
-	TOTAL     = "Total Pods"
+	COMPONENT  = "Kubeflow Component"
+	CONTAINERS = "Containers Ready"
+	PODS       = "Pods Running"
+	TOTAL      = "Total Pods"
 )
 
 func BuildStatusTable(cc utilities.ClientContext) *component.Table {
 	table := component.NewTableWithRows(
 		"Status", "No Kubeflow services found!",
-		component.NewTableCols(COMPONENT, READY, RUNNING, TOTAL),
+		component.NewTableCols(COMPONENT, CONTAINERS, PODS),
 		[]component.TableRow{})
 
 	for _, status := range kubeflow.GetStatus(cc) {
 		tr := component.TableRow{
-			COMPONENT: component.NewText(status.Name),
-			READY:     component.NewText(fmt.Sprint(status.ReadyPods)),
-			RUNNING:   component.NewText(fmt.Sprint(status.RunningPods)),
-			TOTAL:     component.NewText(fmt.Sprint(status.TotalPods)),
+			COMPONENT:  component.NewText(status.Name),
+			CONTAINERS: component.NewText(status.Containers.String()),
+			PODS:       component.NewText(status.Pods.String()),
 		}
 
 		table.Add(tr)

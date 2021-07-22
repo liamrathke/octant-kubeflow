@@ -17,6 +17,8 @@ limitations under the License.
 package kubeflow // import "github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
 
 import (
+	"fmt"
+
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -24,9 +26,20 @@ import (
 type ComponentStatus struct {
 	Name        string
 	Namespace   string
+	Containers  Status
+	Pods        Status
 	TotalPods   int
 	ReadyPods   int
 	RunningPods int
+}
+
+type Status struct {
+	OK    int
+	Total int
+}
+
+func (s *Status) String() string {
+	return fmt.Sprintf("%d/%d", s.OK, s.Total)
 }
 
 var COMPONENTS = []ComponentStatus{
@@ -55,14 +68,16 @@ func getStatusForComponent(cc utilities.ClientContext, component ComponentStatus
 	}
 
 	for _, pod := range pods {
-		component.TotalPods++
-
-		if true { // fix!
-			component.ReadyPods++
+		for _, status := range pod.Status.ContainerStatuses {
+			component.Containers.Total++
+			if status.Ready {
+				component.Containers.OK++
+			}
 		}
 
+		component.Pods.Total++
 		if pod.Status.Phase == corev1.PodRunning {
-			component.RunningPods++
+			component.Pods.OK++
 		}
 	}
 
