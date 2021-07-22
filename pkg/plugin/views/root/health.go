@@ -30,17 +30,17 @@ const (
 	TOTAL      = "Total Pods"
 )
 
-func BuildStatusTable(cc utilities.ClientContext) *component.Table {
+func BuildHealthTable(cc utilities.ClientContext) *component.Table {
 	table := component.NewTableWithRows(
-		"Status", "No Kubeflow services found!",
+		"Kubeflow Component Health", "No Kubeflow services found!",
 		component.NewTableCols(COMPONENT, CONTAINERS, PODS),
 		[]component.TableRow{})
 
-	for _, status := range kubeflow.GetStatus(cc) {
+	for _, kfc := range kubeflow.GetHealth(cc) {
 		tr := component.TableRow{
-			COMPONENT:  component.NewText(status.Name),
-			CONTAINERS: component.NewText(status.Containers.String()),
-			PODS:       component.NewText(status.Pods.String()),
+			COMPONENT:  component.NewText(kfc.Name),
+			CONTAINERS: component.NewText(kfc.Containers.String()),
+			PODS:       component.NewText(kfc.Pods.String()),
 		}
 
 		table.Add(tr)

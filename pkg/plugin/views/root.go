@@ -41,11 +41,11 @@ func BuildRootViewForRequest(request service.Request) (component.Component, erro
 		return nil, err
 	}
 
-	status := root.BuildStatusTable(cc)
+	health := root.BuildHealthTable(cc)
 
 	flexLayout := component.NewFlexLayout("Home")
 	flexLayout.AddSections(component.FlexLayoutSection{
-		{Width: component.WidthHalf, View: status},
+		{Width: component.WidthHalf, View: health},
 	})
 
 	return flexLayout, nil

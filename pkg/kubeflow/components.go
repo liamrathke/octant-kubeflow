@@ -23,14 +23,11 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-type ComponentStatus struct {
-	Name        string
-	Namespace   string
-	Containers  Status
-	Pods        Status
-	TotalPods   int
-	ReadyPods   int
-	RunningPods int
+type KubeflowComponent struct {
+	Name       string
+	Namespace  string
+	Containers Status
+	Pods       Status
 }
 
 type Status struct {
@@ -42,44 +39,35 @@ func (s *Status) String() string {
 	return fmt.Sprintf("%d/%d", s.OK, s.Total)
 }
 
-var COMPONENTS = []ComponentStatus{
-	{Name: "Certificate Manager", Namespace: "cert-manager"},
-	{Name: "Istio (System)", Namespace: "istio-system"},
-	{Name: "Auth", Namespace: "auth"},
-	{Name: "Knative (Eventing)", Namespace: "knative-eventing"},
-	{Name: "Knative (Serving)", Namespace: "knative-serving"},
-	{Name: "Kubeflow", Namespace: "kubeflow"},
-}
-
-func GetStatus(cc utilities.ClientContext) []ComponentStatus {
-	statuses := make([]ComponentStatus, len(COMPONENTS))
+func GetHealth(cc utilities.ClientContext) []KubeflowComponent {
+	statuses := make([]KubeflowComponent, len(COMPONENTS))
 
 	for c := range COMPONENTS {
-		statuses[c], _ = getStatusForComponent(cc, COMPONENTS[c])
+		statuses[c], _ = getHealthForComponent(cc, COMPONENTS[c])
 	}
 
 	return statuses
 }
 
-func getStatusForComponent(cc utilities.ClientContext, component ComponentStatus) (ComponentStatus, error) {
-	pods, err := getPodsInNamespace(cc, component.Namespace)
+func getHealthForComponent(cc utilities.ClientContext, kfc KubeflowComponent) (KubeflowComponent, error) {
+	pods, err := getPodsInNamespace(cc, kfc.Namespace)
 	if err != nil {
-		return ComponentStatus{}, err
+		return KubeflowComponent{}, err
 	}
 
 	for _, pod := range pods {
 		for _, status := range pod.Status.ContainerStatuses {
-			component.Containers.Total++
+			kfc.Containers.Total++
 			if status.Ready {
-				component.Containers.OK++
+				kfc.Containers.OK++
 			}
 		}
 
-		component.Pods.Total++
+		kfc.Pods.Total++
 		if pod.Status.Phase == corev1.PodRunning {
-			component.Pods.OK++
+			kfc.Pods.OK++
 		}
 	}
 
-	return component, err
+	return kfc, err
 }
