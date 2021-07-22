@@ -36,7 +36,8 @@ func BuildHealthTable(cc utilities.ClientContext) *component.Table {
 		component.NewTableCols(COMPONENT, CONTAINERS, PODS),
 		[]component.TableRow{})
 
-	for _, kfc := range kubeflow.GetHealth(cc) {
+	kubeflowComponents, _ := kubeflow.GetHealth(cc)
+	for _, kfc := range kubeflowComponents {
 		tr := component.TableRow{
 			COMPONENT:  component.NewText(kfc.Name),
 			CONTAINERS: component.NewText(kfc.Containers.String()),

@@ -39,14 +39,24 @@ func (s *Status) String() string {
 	return fmt.Sprintf("%d/%d", s.OK, s.Total)
 }
 
-func GetHealth(cc utilities.ClientContext) []KubeflowComponent {
+var COMPONENTS = []KubeflowComponent{
+	{Name: "Certificate Manager", Namespace: "cert-manager"},
+	{Name: "Istio (System)", Namespace: "istio-system"},
+	{Name: "Auth", Namespace: "auth"},
+	{Name: "Knative (Eventing)", Namespace: "knative-eventing"},
+	{Name: "Knative (Serving)", Namespace: "knative-serving"},
+	{Name: "Kubeflow", Namespace: "kubeflow"},
+}
+
+func GetHealth(cc utilities.ClientContext) ([]KubeflowComponent, error) {
+	var err error
 	statuses := make([]KubeflowComponent, len(COMPONENTS))
 
 	for c := range COMPONENTS {
-		statuses[c], _ = getHealthForComponent(cc, COMPONENTS[c])
+		statuses[c], err = getHealthForComponent(cc, COMPONENTS[c])
 	}
 
-	return statuses
+	return statuses, err
 }
 
 func getHealthForComponent(cc utilities.ClientContext, kfc KubeflowComponent) (KubeflowComponent, error) {

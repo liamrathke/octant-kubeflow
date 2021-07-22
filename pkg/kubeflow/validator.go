@@ -20,15 +20,7 @@ import (
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
 )
 
-var COMPONENTS = []KubeflowComponent{
-	{Name: "Certificate Manager", Namespace: "cert-manager"},
-	{Name: "Istio (System)", Namespace: "istio-system"},
-	{Name: "Auth", Namespace: "auth"},
-	{Name: "Knative (Eventing)", Namespace: "knative-eventing"},
-	{Name: "Knative (Serving)", Namespace: "knative-serving"},
-	{Name: "Kubeflow", Namespace: "kubeflow"},
-}
-
 func ValidateComponents(cc utilities.ClientContext) bool {
-	return true
+	_, err := GetHealth(cc)
+	return err == nil
 }
