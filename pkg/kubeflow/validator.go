@@ -17,10 +17,22 @@ limitations under the License.
 package kubeflow // import "github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
 
 import (
+	"time"
+
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
+	"github.com/liamrathke/octant-kubeflow/pkg/state"
 )
 
-func ValidateComponents(cc utilities.ClientContext) bool {
+func Validate(cc utilities.ClientContext) bool {
+	state := state.GetState()
+	if !state.Validator.Timestamp.IsZero() {
+		state.Validator.Installed = validateComponents(cc)
+		state.Validator.Timestamp = time.Now()
+	}
+	return state.Validator.Installed
+}
+
+func validateComponents(cc utilities.ClientContext) bool {
 	_, err := GetHealth(cc)
 	return err == nil
 }

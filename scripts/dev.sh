@@ -15,8 +15,7 @@ function run_octant {
 }
 
 function run_octant_local {
-  OCTANT_DISABLE_OPEN_BROWSER=true octant --plugin-path=${DIR}/../bin/
-  # (cd $HOME/work/octant && ls && OCTANT_DISABLE_OPEN_BROWSER=true OCTANT_PLUGIN_PATH=${DIR}/../bin/ go run build.go serve)
+  (cd $HOME/work/octant && ls && OCTANT_DISABLE_OPEN_BROWSER=true OCTANT_PLUGIN_PATH=${DIR}/../bin/ go run build.go serve)
 }
 
 function log {

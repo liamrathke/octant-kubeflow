@@ -17,33 +17,14 @@ limitations under the License.
 package views // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 
 import (
-	"github.com/vmware-tanzu/octant/pkg/store"
-	"github.com/vmware-tanzu/octant/pkg/view/component"
-	"k8s.io/apimachinery/pkg/labels"
-
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
-	"github.com/liamrathke/octant-kubeflow/pkg/plugin/views/root"
+	"github.com/vmware-tanzu/octant/pkg/view/component"
 )
 
-func BuildRootViewForCC(cc utilities.ClientContext) (component.Component, error) {
-	_, err := cc.List(store.Key{
-		APIVersion: "v1",
-		Kind:       "Secret",
-		Selector: &labels.Set{
-			"owner": "kubeflow",
-		},
-	})
+func BuildInstallViewForCC(cc utilities.ClientContext) (component.Component, error) {
+	// cc := utilities.ClientContext{Client: request.DashboardClient(), Context: request.Context()}
 
-	if err != nil {
-		return nil, err
-	}
+	prompt := component.NewText("Install Kubeflow!")
 
-	health := root.BuildHealthTable(cc)
-
-	flexLayout := component.NewFlexLayout("Home")
-	flexLayout.AddSections(component.FlexLayoutSection{
-		{Width: component.WidthHalf, View: health},
-	})
-
-	return flexLayout, nil
+	return prompt, nil
 }

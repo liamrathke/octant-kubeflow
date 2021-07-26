@@ -25,7 +25,6 @@ import (
 	"github.com/liamrathke/octant-kubeflow/pkg/state"
 
 	"github.com/vmware-tanzu/octant/pkg/plugin/api"
-	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/store"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 	"k8s.io/apimachinery/pkg/labels"
@@ -33,9 +32,7 @@ import (
 
 const DASHBOARD_PORT = 8080
 
-func BuildDashboardViewForRequest(request service.Request) (component.Component, error) {
-	cc := utilities.ClientContext{Client: request.DashboardClient(), Context: request.Context()}
-
+func BuildDashboardViewForCC(cc utilities.ClientContext) (component.Component, error) {
 	_, err := cc.List(store.Key{
 		APIVersion: "v1",
 		Kind:       "Secret",

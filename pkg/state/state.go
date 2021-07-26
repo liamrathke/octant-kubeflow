@@ -16,10 +16,18 @@ limitations under the License.
 
 package state // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/state"
 
+import "time"
+
 var state State
 
 type State struct {
+	Validator Validator
 	Dashboard Dashboard
+}
+
+type Validator struct {
+	Installed bool
+	Timestamp time.Time
 }
 
 type Dashboard struct {
@@ -29,6 +37,7 @@ type Dashboard struct {
 
 func NewState() {
 	state = State{
+		Validator: Validator{},
 		Dashboard: Dashboard{},
 	}
 }

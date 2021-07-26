@@ -17,15 +17,19 @@ limitations under the License.
 package router // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/router"
 
 import (
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
-	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 )
 
-func rootHandler(request service.Request) (component.Component, error) {
-	return views.BuildRootViewForRequest(request)
+func rootHandler(cc utilities.ClientContext) (component.Component, error) {
+	return views.BuildRootViewForCC(cc)
 }
 
-func dashboardHandler(request service.Request) (component.Component, error) {
-	return views.BuildDashboardViewForRequest(request)
+func installHandler(cc utilities.ClientContext) (component.Component, error) {
+	return views.BuildInstallViewForCC(cc)
+}
+
+func dashboardHandler(cc utilities.ClientContext) (component.Component, error) {
+	return views.BuildDashboardViewForCC(cc)
 }

@@ -17,17 +17,20 @@ limitations under the License.
 package router // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/router"
 
 import (
+	"github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 )
 
 var r *service.Router
 
-type Handler func(request service.Request) (component.Component, error)
+type Handler func(cc utilities.ClientContext) (component.Component, error)
 
 func InitRoutes(router *service.Router) {
 	r = router
 	routeHelper("", rootHandler)
+	routeHelper("/install", installHandler)
 	routeHelper("/dashboard", dashboardHandler)
 }
 
@@ -38,9 +41,13 @@ func routeHelper(routePath string, handler Handler) {
 }
 
 func handleMiddleware(request service.Request, handler Handler) (component.ContentResponse, error) {
+	cc := utilities.ClientContext{Client: request.DashboardClient(), Context: request.Context()}
+	if !kubeflow.Validate(cc) {
+		// Redirect to install page
+	}
 	// Middleware code goes here
 	// If Kubeflow not installed, redirect to information page (later installation page)
-	view, err := handler(request)
+	view, err := handler(cc)
 	if err != nil {
 		return component.EmptyContentResponse, err
 	}
