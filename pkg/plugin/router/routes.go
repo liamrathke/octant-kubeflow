@@ -23,24 +23,28 @@ import (
 
 var r *service.Router
 
+type Handler func(request service.Request) (component.Component, error)
+
 func InitRoutes(router *service.Router) {
 	r = router
 	routeHelper("", rootHandler)
 	routeHelper("/dashboard", dashboardHandler)
 }
 
-func routeHelper(routePath string, handleFunc service.HandleFunc) {
+func routeHelper(routePath string, handler Handler) {
 	r.HandleFunc(routePath, func(request service.Request) (component.ContentResponse, error) {
-		return handleMiddleware(request, handleFunc)
+		return handleMiddleware(request, handler)
 	})
 }
 
-func handleMiddleware(request service.Request, handleFunc service.HandleFunc) (component.ContentResponse, error) {
+func handleMiddleware(request service.Request, handler Handler) (component.ContentResponse, error) {
 	// Middleware code goes here
 	// If Kubeflow not installed, redirect to information page (later installation page)
-	view, err := handleFunc(request)
+	view, err := handler(request)
 	if err != nil {
 		return component.EmptyContentResponse, err
 	}
-	return view, nil
+	response := component.NewContentResponse(nil)
+	response.Add(view)
+	return *response, nil
 }

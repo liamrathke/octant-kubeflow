@@ -22,22 +22,10 @@ import (
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 )
 
-func rootHandler(request service.Request) (component.ContentResponse, error) {
-	rootView, err := views.BuildRootViewForRequest(request)
-	if err != nil {
-		return component.EmptyContentResponse, err
-	}
-	response := component.NewContentResponse(nil)
-	response.Add(rootView)
-	return *response, nil
+func rootHandler(request service.Request) (component.Component, error) {
+	return views.BuildRootViewForRequest(request)
 }
 
-func dashboardHandler(request service.Request) (component.ContentResponse, error) {
-	dashboardView, err := views.BuildDashboardViewForRequest(request)
-	if err != nil {
-		return component.EmptyContentResponse, err
-	}
-	response := component.NewContentResponse(nil)
-	response.Add(dashboardView)
-	return *response, nil
+func dashboardHandler(request service.Request) (component.Component, error) {
+	return views.BuildDashboardViewForRequest(request)
 }
