@@ -25,19 +25,12 @@ var r *service.Router
 
 func InitRoutes(router *service.Router) {
 	r = router
-	router.HandleFunc("/", func(request service.Request) (component.ContentResponse, error) {
-		return component.ContentResponse{}, nil
-	})
 	routeHelper("", rootHandler)
 	routeHelper("/dashboard", dashboardHandler)
 }
 
 func routeHelper(routePath string, handleFunc service.HandleFunc) {
-	// var wrapMiddleware service.HandleFunc
-	// wrapMiddleware = func(request service.Request) {
-	// 	return handleMiddleware(request, handleFunc)
-	// }
-	r.HandleFunc(routePath, func(request service.Request) {
+	r.HandleFunc(routePath, func(request service.Request) (component.ContentResponse, error) {
 		return handleMiddleware(request, handleFunc)
 	})
 }
