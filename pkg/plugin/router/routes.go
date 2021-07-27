@@ -42,11 +42,11 @@ func routeHelper(routePath string, handler Handler) {
 
 func handleMiddleware(request service.Request, handler Handler) (component.ContentResponse, error) {
 	cc := utilities.ClientContext{Client: request.DashboardClient(), Context: request.Context()}
+
 	if !kubeflow.Validate(cc) {
 		// Redirect to install page
 	}
-	// Middleware code goes here
-	// If Kubeflow not installed, redirect to information page (later installation page)
+
 	view, err := handler(cc)
 	if err != nil {
 		return component.EmptyContentResponse, err

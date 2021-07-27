@@ -14,18 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package views // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
+package markdown // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/markdown"
 
 import (
-	"github.com/liamrathke/octant-kubeflow/pkg/markdown"
-	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
+	"embed"
+	"path"
+
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 )
 
-func BuildInstallViewForCC(cc utilities.ClientContext) (component.Component, error) {
-	// cc := utilities.ClientContext{Client: request.DashboardClient(), Context: request.Context()}
+//go:embed templates/*
+var fs embed.FS
 
-	prompt, err := markdown.FileToComponent("install/prompt.md")
+func FileToComponent(file string) (component.Component, error) {
+	path := path.Join("templates", file)
+	buf, err := fs.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
 
-	return prompt, err
+	text := string(buf)
+	return component.NewMarkdownText(text), err
 }
