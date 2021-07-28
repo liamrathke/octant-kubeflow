@@ -16,22 +16,14 @@ limitations under the License.
 
 package state // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/state"
 
-var state State
+type Stage int
 
-type State struct {
-	Validator Validator
-	Installer Installer
-	Dashboard Dashboard
-}
+const (
+	NOT_INSTALLED Stage = iota
+	INSTALLING
+	INSTALLED
+)
 
-func NewState() {
-	state = State{
-		Validator: Validator{},
-		Installer: Installer{},
-		Dashboard: Dashboard{},
-	}
-}
-
-func GetState() *State {
-	return &state
+type Installer struct {
+	Stage Stage
 }

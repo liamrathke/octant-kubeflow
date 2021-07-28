@@ -16,22 +16,7 @@ limitations under the License.
 
 package state // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/state"
 
-var state State
-
-type State struct {
-	Validator Validator
-	Installer Installer
-	Dashboard Dashboard
-}
-
-func NewState() {
-	state = State{
-		Validator: Validator{},
-		Installer: Installer{},
-		Dashboard: Dashboard{},
-	}
-}
-
-func GetState() *State {
-	return &state
+type Dashboard struct {
+	IsPortForwarded bool
+	Port            uint16
 }

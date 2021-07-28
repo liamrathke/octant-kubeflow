@@ -16,22 +16,9 @@ limitations under the License.
 
 package state // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/state"
 
-var state State
+import "time"
 
-type State struct {
-	Validator Validator
-	Installer Installer
-	Dashboard Dashboard
-}
-
-func NewState() {
-	state = State{
-		Validator: Validator{},
-		Installer: Installer{},
-		Dashboard: Dashboard{},
-	}
-}
-
-func GetState() *State {
-	return &state
+type Validator struct {
+	Installed bool
+	Timestamp time.Time
 }

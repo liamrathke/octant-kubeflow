@@ -17,15 +17,47 @@ limitations under the License.
 package views // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views"
 
 import (
+	"fmt"
+
 	"github.com/liamrathke/octant-kubeflow/pkg/markdown"
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/actions"
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
+	"github.com/liamrathke/octant-kubeflow/pkg/state"
+	"github.com/vmware-tanzu/octant/pkg/action"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 )
 
 func BuildInstallViewForCC(cc utilities.ClientContext) (component.Component, error) {
 	// cc := utilities.ClientContext{Client: request.DashboardClient(), Context: request.Context()}
 
-	prompt, err := markdown.FileToComponent("install/prompt.md")
+	switch state.GetState().Installer.Stage {
+	case state.NOT_INSTALLED:
+		return buildNotInstalledView(cc)
+	case state.INSTALLING:
+		return buildInstallingView(cc)
+	default:
+		return nil, fmt.Errorf("unable to find installer view based on state")
+	}
+}
 
-	return prompt, err
+func buildNotInstalledView(cc utilities.ClientContext) (component.Component, error) {
+	prompt, err := markdown.FileToComponent("install/not_installed.md")
+
+	payload := action.Payload{
+		"action": actions.InstallKubeflow,
+	}
+	button := component.NewButton("I understand, install Kubeflow", payload)
+
+	flexLayout := component.NewFlexLayout("Install Kubeflow")
+	flexLayout.AddSections(component.FlexLayoutSection{
+		{Width: component.WidthFull, View: prompt},
+		{Width: component.WidthFull, View: button},
+	})
+
+	return flexLayout, err
+}
+
+func buildInstallingView(cc utilities.ClientContext) (component.Component, error) {
+	text := component.NewText("Installing Kubeflow!")
+	return text, nil
 }

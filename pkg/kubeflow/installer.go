@@ -14,24 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package state // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/state"
+package kubeflow // import "github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
 
-var state State
+import "github.com/liamrathke/octant-kubeflow/pkg/state"
 
-type State struct {
-	Validator Validator
-	Installer Installer
-	Dashboard Dashboard
-}
-
-func NewState() {
-	state = State{
-		Validator: Validator{},
-		Installer: Installer{},
-		Dashboard: Dashboard{},
-	}
-}
-
-func GetState() *State {
-	return &state
+func Install() {
+	state.GetState().Installer.Stage = state.INSTALLING
 }
