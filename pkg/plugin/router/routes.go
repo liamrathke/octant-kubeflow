@@ -44,7 +44,7 @@ func handleMiddleware(request service.Request, handler Handler) (component.Conte
 	cc := utilities.ClientContext{Client: request.DashboardClient(), Context: request.Context()}
 
 	if !kubeflow.Validate(cc) {
-		// Redirect to install page
+		// redirectInstall(cc)
 	}
 
 	view, err := handler(cc)
@@ -54,4 +54,8 @@ func handleMiddleware(request service.Request, handler Handler) (component.Conte
 	response := component.NewContentResponse(nil)
 	response.Add(view)
 	return *response, nil
+}
+
+func redirectInstall(cc utilities.ClientContext) {
+	// Redirect to install page
 }
