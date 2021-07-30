@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	RequestSetContentPath = "action.octant.dev/setContentPath"
+	RequestSetContentPath = "event.octant.dev/contentPath"
 )
 
 var r *service.Router

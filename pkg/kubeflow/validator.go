@@ -25,15 +25,20 @@ import (
 
 func Validate(cc utilities.ClientContext) bool {
 	state := state.GetState()
-	if !state.Validator.Timestamp.IsZero() {
-		state.Validator.Installed = false
-		// state.Validator.Installed = validateComponents(cc)
+	if state.Validator.Timestamp.IsZero() {
+		state.Validator.Installed = validateComponents(cc)
 		state.Validator.Timestamp = time.Now()
 	}
 	return state.Validator.Installed
 }
 
 func validateComponents(cc utilities.ClientContext) bool {
-	_, err := GetHealth(cc)
-	return err == nil
+	kfcs, err := GetHealth(cc)
+	totalContainers := 0
+
+	for _, kfc := range kfcs {
+		totalContainers += kfc.Containers.Total
+	}
+
+	return (totalContainers > 0) || (err == nil)
 }
