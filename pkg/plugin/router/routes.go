@@ -19,8 +19,14 @@ package router // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/route
 import (
 	"github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
+	"github.com/vmware-tanzu/octant/pkg/action"
+	"github.com/vmware-tanzu/octant/pkg/plugin"
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
+)
+
+const (
+	RequestSetContentPath = "action.octant.dev/setContentPath"
 )
 
 var r *service.Router
@@ -44,7 +50,7 @@ func handleMiddleware(request service.Request, handler Handler) (component.Conte
 	cc := utilities.ClientContext{Client: request.DashboardClient(), Context: request.Context()}
 
 	if !kubeflow.Validate(cc) {
-		// redirectInstall(cc)
+		redirectInstall(cc)
 	}
 
 	view, err := handler(cc)
@@ -57,5 +63,7 @@ func handleMiddleware(request service.Request, handler Handler) (component.Conte
 }
 
 func redirectInstall(cc utilities.ClientContext) {
-	// Redirect to install page
+	cc.Client.SendEvent(cc.Context, plugin.ClientStateFrom(cc.Context).ClientID(), RequestSetContentPath, action.Payload{
+		"contentPath": "/kubeflow/install",
+	})
 }

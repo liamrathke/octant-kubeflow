@@ -26,7 +26,8 @@ import (
 func Validate(cc utilities.ClientContext) bool {
 	state := state.GetState()
 	if !state.Validator.Timestamp.IsZero() {
-		state.Validator.Installed = validateComponents(cc)
+		state.Validator.Installed = false
+		// state.Validator.Installed = validateComponents(cc)
 		state.Validator.Timestamp = time.Now()
 	}
 	return state.Validator.Installed
