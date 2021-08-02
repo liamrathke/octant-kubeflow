@@ -17,17 +17,10 @@ limitations under the License.
 package root // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views/root"
 
 import (
-	"fmt"
-
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 
 	"github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
-)
-
-const (
-	STATUS_OK      = "✅"
-	STATUS_WARNING = "⛔"
 )
 
 const (
@@ -43,35 +36,43 @@ func BuildHealthView(cc utilities.ClientContext) (component.Component, error) {
 		return nil, err
 	}
 
-	flexLayout := component.NewFlexLayout("Kubeflow Component Status")
+	flexLayout := component.NewFlexLayout("Kubeflow Health")
 
-	for _, kfc := range kubeflowComponents {
-		var statusEmoji string
-		if kfc.OK {
-			statusEmoji = STATUS_OK
-		} else {
-			statusEmoji = STATUS_WARNING
-		}
+	services := buildServiceSection(cc, kubeflowComponents)
+	flexLayout.AddSections(services)
 
-		title := fmt.Sprintf("%s %s", kfc.Name, statusEmoji)
+	failing := buildFailingSection(cc, kubeflowComponents)
+	flexLayout.AddSections(failing)
 
-		quadrant := component.NewQuadrant(title)
-		quadrant.Set(component.QuadNW, "Running", fmt.Sprintf("%d", kfc.Containers.Up))
-		quadrant.Set(component.QuadNE, "Containers", fmt.Sprintf("%d", kfc.Containers.Total))
-		quadrant.Set(component.QuadSW, "Ready", fmt.Sprintf("%d", kfc.Pods.Up))
-		quadrant.Set(component.QuadSE, "Pods", fmt.Sprintf("%d", kfc.Containers.Total))
+	return flexLayout, err
+}
 
-		flexLayout.AddSections(component.FlexLayoutSection{
-			{Width: component.WidthQuarter, View: quadrant},
+func buildServiceSection(cc utilities.ClientContext, kfcs []kubeflow.KubeflowComponent) component.FlexLayoutSection {
+	services := make(component.FlexLayoutSection, len(kfcs))
+	for index, kfc := range kfcs {
+		title := component.NewText(kfc.Name)
+		card := component.NewCard([]component.TitleComponent{title})
+
+		cardLayout := component.NewFlexLayout("")
+		cardLayout.AddSections(component.FlexLayoutSection{
+			{Width: component.WidthHalf, View: donutFromStatus(kfc.Containers, "Containers", "Container")},
+			{Width: component.WidthHalf, View: donutFromStatus(kfc.Pods, "Pods", "Pod")},
 		})
-	}
 
+		card.SetBody(cardLayout)
+
+		services[index] = component.FlexLayoutItem{Width: component.WidthThird, View: card}
+	}
+	return services
+}
+
+func buildFailingSection(cc utilities.ClientContext, kfcs []kubeflow.KubeflowComponent) component.FlexLayoutSection {
 	table := component.NewTableWithRows(
 		"Failing Kubeflow Components", "No Kubeflow services found!",
 		component.NewTableCols(COMPONENT, CONTAINERS, PODS),
 		[]component.TableRow{})
 
-	for _, kfc := range kubeflowComponents {
+	for _, kfc := range kfcs {
 		tr := component.TableRow{
 			COMPONENT:  component.NewText(kfc.Name),
 			CONTAINERS: component.NewText(kfc.Containers.String()),
@@ -81,9 +82,21 @@ func BuildHealthView(cc utilities.ClientContext) (component.Component, error) {
 		table.Add(tr)
 	}
 
-	flexLayout.AddSections(component.FlexLayoutSection{
+	return component.FlexLayoutSection{
 		{Width: component.WidthFull, View: table},
-	})
+	}
+}
 
-	return flexLayout, err
+func donutFromStatus(status kubeflow.Status, plural, singular string) component.Component {
+	donut := component.NewDonutChart()
+	donut.SetLabels(plural, singular)
+	donut.SetSize(component.DonutChartSizeMedium)
+
+	segments := []component.DonutSegment{
+		{Count: status.Up, Status: component.NodeStatusOK},
+		{Count: status.Down, Status: component.NodeStatusWarning},
+	}
+	donut.SetSegments(segments)
+
+	return donut
 }

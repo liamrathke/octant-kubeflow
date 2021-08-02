@@ -33,6 +33,7 @@ type KubeflowComponent struct {
 
 type Status struct {
 	Up    int
+	Down  int
 	Total int
 }
 
@@ -74,6 +75,7 @@ func getHealthForComponent(cc utilities.ClientContext, kfc KubeflowComponent) (K
 			if status.Ready {
 				kfc.Containers.Up++
 			} else {
+				kfc.Containers.Down++
 				kfc.OK = false
 			}
 		}
@@ -82,6 +84,7 @@ func getHealthForComponent(cc utilities.ClientContext, kfc KubeflowComponent) (K
 		if pod.Status.Phase == corev1.PodRunning {
 			kfc.Pods.Up++
 		} else {
+			kfc.Pods.Down++
 			kfc.OK = false
 		}
 	}
