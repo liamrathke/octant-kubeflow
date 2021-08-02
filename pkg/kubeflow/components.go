@@ -28,6 +28,7 @@ type KubeflowComponent struct {
 	Namespace  string
 	Containers Status
 	Pods       Status
+	Unready    []corev1.Pod
 	OK         bool
 }
 
@@ -86,6 +87,7 @@ func getHealthForComponent(cc utilities.ClientContext, kfc KubeflowComponent) (K
 		} else {
 			kfc.Pods.Down++
 			kfc.OK = false
+			kfc.Unready = append(kfc.Unready, pod)
 		}
 	}
 

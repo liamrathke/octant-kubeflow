@@ -17,6 +17,9 @@ limitations under the License.
 package root // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views/root"
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 
 	"github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
@@ -24,9 +27,22 @@ import (
 )
 
 const (
-	COMPONENT  = "Kubeflow Component"
-	CONTAINERS = "Containers Ready"
-	PODS       = "Pods Running"
+	KUBEFLOW_HEALTH          = "Kubeflow Health"
+	KUBEFLOW_SERVICES        = "Kubeflow Services"
+	KUBEFLOW_UNREADY_PODS    = "Unready Pods"
+	KUBEFLOW_NO_UNREADY_PODS = "No unready pods found!"
+)
+
+const (
+	NAMESPACE = "Namespace"
+	NAME      = "Pod Name"
+	AGE       = "Age"
+	ACTION    = "Action"
+)
+
+const (
+	DONUT_SIZE      = component.DonutChartSizeMedium
+	DONUT_THICKNESS = 25
 )
 
 func BuildHealthView(cc utilities.ClientContext) (component.Component, error) {
@@ -36,13 +52,13 @@ func BuildHealthView(cc utilities.ClientContext) (component.Component, error) {
 		return nil, err
 	}
 
-	flexLayout := component.NewFlexLayout("Kubeflow Health")
+	flexLayout := component.NewFlexLayout(KUBEFLOW_HEALTH)
 
 	services := buildServiceSection(cc, kubeflowComponents)
 	flexLayout.AddSections(services)
 
-	failing := buildFailingSection(cc, kubeflowComponents)
-	flexLayout.AddSections(failing)
+	unready := buildUnreadySection(cc, kubeflowComponents)
+	flexLayout.AddSections(unready)
 
 	return flexLayout, err
 }
@@ -53,7 +69,7 @@ func buildServiceSection(cc utilities.ClientContext, kfcs []kubeflow.KubeflowCom
 		title := component.NewText(kfc.Name)
 		card := component.NewCard([]component.TitleComponent{title})
 
-		cardLayout := component.NewFlexLayout("")
+		cardLayout := component.NewFlexLayout(KUBEFLOW_SERVICES)
 		cardLayout.AddSections(component.FlexLayoutSection{
 			{Width: component.WidthHalf, View: donutFromStatus(kfc.Containers, "Containers", "Container")},
 			{Width: component.WidthHalf, View: donutFromStatus(kfc.Pods, "Pods", "Pod")},
@@ -66,21 +82,25 @@ func buildServiceSection(cc utilities.ClientContext, kfcs []kubeflow.KubeflowCom
 	return services
 }
 
-func buildFailingSection(cc utilities.ClientContext, kfcs []kubeflow.KubeflowComponent) component.FlexLayoutSection {
+func buildUnreadySection(cc utilities.ClientContext, kfcs []kubeflow.KubeflowComponent) component.FlexLayoutSection {
 	table := component.NewTableWithRows(
-		"Failing Kubeflow Components", "No Kubeflow services found!",
-		component.NewTableCols(COMPONENT, CONTAINERS, PODS),
+		KUBEFLOW_UNREADY_PODS, KUBEFLOW_NO_UNREADY_PODS,
+		component.NewTableCols(NAMESPACE, NAME, AGE, ACTION),
 		[]component.TableRow{})
 
 	for _, kfc := range kfcs {
-		tr := component.TableRow{
-			COMPONENT:  component.NewText(kfc.Name),
-			CONTAINERS: component.NewText(kfc.Containers.String()),
-			PODS:       component.NewText(kfc.Pods.String()),
+		for _, pod := range kfc.Unready {
+			tr := component.TableRow{
+				NAMESPACE: component.NewText(pod.Namespace),
+				NAME:      component.NewText(pod.Name),
+				AGE:       component.NewText(fmt.Sprintf("%d", time.Now().Sub(pod.Status.StartTime.Time))),
+				ACTION:    component.NewText("Restart Pod"),
+			}
+			table.Add(tr)
 		}
-
-		table.Add(tr)
 	}
+
+	table.Sort(NAME)
 
 	return component.FlexLayoutSection{
 		{Width: component.WidthFull, View: table},
@@ -89,8 +109,10 @@ func buildFailingSection(cc utilities.ClientContext, kfcs []kubeflow.KubeflowCom
 
 func donutFromStatus(status kubeflow.Status, plural, singular string) component.Component {
 	donut := component.NewDonutChart()
+	donut.SetSize(DONUT_SIZE)
+	donut.SetThickness(DONUT_THICKNESS)
+
 	donut.SetLabels(plural, singular)
-	donut.SetSize(component.DonutChartSizeMedium)
 
 	segments := []component.DonutSegment{
 		{Count: status.Up, Status: component.NodeStatusOK},
