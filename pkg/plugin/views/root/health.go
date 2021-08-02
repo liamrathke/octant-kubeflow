@@ -17,6 +17,8 @@ limitations under the License.
 package root // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views/root"
 
 import (
+	"fmt"
+
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 
 	"github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
@@ -24,19 +26,51 @@ import (
 )
 
 const (
+	STATUS_OK      = "✅"
+	STATUS_WARNING = "⛔"
+)
+
+const (
 	COMPONENT  = "Kubeflow Component"
 	CONTAINERS = "Containers Ready"
 	PODS       = "Pods Running"
-	TOTAL      = "Total Pods"
 )
 
-func BuildHealthTable(cc utilities.ClientContext) *component.Table {
+func BuildHealthView(cc utilities.ClientContext) (component.Component, error) {
+	kubeflowComponents, err := kubeflow.GetHealth(cc)
+
+	if err != nil {
+		return nil, err
+	}
+
+	flexLayout := component.NewFlexLayout("Kubeflow Component Status")
+
+	for _, kfc := range kubeflowComponents {
+		var statusEmoji string
+		if kfc.OK {
+			statusEmoji = STATUS_OK
+		} else {
+			statusEmoji = STATUS_WARNING
+		}
+
+		title := fmt.Sprintf("%s %s", kfc.Name, statusEmoji)
+
+		quadrant := component.NewQuadrant(title)
+		quadrant.Set(component.QuadNW, "Running", fmt.Sprintf("%d", kfc.Containers.Up))
+		quadrant.Set(component.QuadNE, "Containers", fmt.Sprintf("%d", kfc.Containers.Total))
+		quadrant.Set(component.QuadSW, "Ready", fmt.Sprintf("%d", kfc.Pods.Up))
+		quadrant.Set(component.QuadSE, "Pods", fmt.Sprintf("%d", kfc.Containers.Total))
+
+		flexLayout.AddSections(component.FlexLayoutSection{
+			{Width: component.WidthQuarter, View: quadrant},
+		})
+	}
+
 	table := component.NewTableWithRows(
-		"Kubeflow Component Health", "No Kubeflow services found!",
+		"Failing Kubeflow Components", "No Kubeflow services found!",
 		component.NewTableCols(COMPONENT, CONTAINERS, PODS),
 		[]component.TableRow{})
 
-	kubeflowComponents, _ := kubeflow.GetHealth(cc)
 	for _, kfc := range kubeflowComponents {
 		tr := component.TableRow{
 			COMPONENT:  component.NewText(kfc.Name),
@@ -47,6 +81,9 @@ func BuildHealthTable(cc utilities.ClientContext) *component.Table {
 		table.Add(tr)
 	}
 
-	table.Sort("Service")
-	return table
+	flexLayout.AddSections(component.FlexLayoutSection{
+		{Width: component.WidthFull, View: table},
+	})
+
+	return flexLayout, err
 }

@@ -38,12 +38,7 @@ func BuildRootViewForCC(cc utilities.ClientContext) (component.Component, error)
 		return nil, err
 	}
 
-	health := root.BuildHealthTable(cc)
+	health, err := root.BuildHealthView(cc)
 
-	flexLayout := component.NewFlexLayout("Home")
-	flexLayout.AddSections(component.FlexLayoutSection{
-		{Width: component.WidthHalf, View: health},
-	})
-
-	return flexLayout, nil
+	return health, err
 }

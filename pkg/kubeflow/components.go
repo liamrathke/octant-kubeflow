@@ -28,15 +28,16 @@ type KubeflowComponent struct {
 	Namespace  string
 	Containers Status
 	Pods       Status
+	OK         bool
 }
 
 type Status struct {
-	OK    int
+	Up    int
 	Total int
 }
 
 func (s *Status) String() string {
-	return fmt.Sprintf("%d/%d", s.OK, s.Total)
+	return fmt.Sprintf("%d/%d", s.Up, s.Total)
 }
 
 var COMPONENTS = []KubeflowComponent{
@@ -65,17 +66,23 @@ func getHealthForComponent(cc utilities.ClientContext, kfc KubeflowComponent) (K
 		return KubeflowComponent{}, err
 	}
 
+	kfc.OK = true
+
 	for _, pod := range pods {
 		for _, status := range pod.Status.ContainerStatuses {
 			kfc.Containers.Total++
 			if status.Ready {
-				kfc.Containers.OK++
+				kfc.Containers.Up++
+			} else {
+				kfc.OK = false
 			}
 		}
 
 		kfc.Pods.Total++
 		if pod.Status.Phase == corev1.PodRunning {
-			kfc.Pods.OK++
+			kfc.Pods.Up++
+		} else {
+			kfc.OK = false
 		}
 	}
 
