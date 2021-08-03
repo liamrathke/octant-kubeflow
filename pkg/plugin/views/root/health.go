@@ -17,9 +17,6 @@ limitations under the License.
 package root // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views/root"
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 
 	"github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
@@ -42,7 +39,7 @@ const (
 
 const (
 	DONUT_SIZE      = component.DonutChartSizeMedium
-	DONUT_THICKNESS = 25
+	DONUT_THICKNESS = 20
 )
 
 func BuildHealthView(cc utilities.ClientContext) (component.Component, error) {
@@ -93,8 +90,8 @@ func buildUnreadySection(cc utilities.ClientContext, kfcs []kubeflow.KubeflowCom
 			tr := component.TableRow{
 				NAMESPACE: component.NewText(pod.Namespace),
 				NAME:      component.NewText(pod.Name),
-				AGE:       component.NewText(fmt.Sprintf("%d", time.Now().Sub(pod.Status.StartTime.Time))),
-				ACTION:    component.NewText("Restart Pod"),
+				AGE:       component.NewTimestamp(pod.CreationTimestamp.Time),
+				ACTION:    component.NewButton("Restart Pod", nil),
 			}
 			table.Add(tr)
 		}
