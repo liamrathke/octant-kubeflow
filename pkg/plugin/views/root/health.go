@@ -17,7 +17,10 @@ limitations under the License.
 package root // import "github.com/liamrathke/octant-kubeflow/pkg/plugin/views/root"
 
 import (
+	"github.com/vmware-tanzu/octant/pkg/action"
+	"github.com/vmware-tanzu/octant/pkg/store"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
+	v1 "k8s.io/api/core/v1"
 
 	"github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
@@ -28,6 +31,7 @@ const (
 	KUBEFLOW_SERVICES        = "Kubeflow Services"
 	KUBEFLOW_UNREADY_PODS    = "Unready Pods"
 	KUBEFLOW_NO_UNREADY_PODS = "No unready pods found!"
+	KUBEFLOW_RESTART_POD     = "Restart Pod"
 )
 
 const (
@@ -40,6 +44,10 @@ const (
 const (
 	DONUT_SIZE      = component.DonutChartSizeMedium
 	DONUT_THICKNESS = 20
+)
+
+const (
+	OCTANT_DELETE_OBJECT_ACTION = "action.octant.dev/deleteObject"
 )
 
 func BuildHealthView(cc utilities.ClientContext) (component.Component, error) {
@@ -87,12 +95,7 @@ func buildUnreadySection(cc utilities.ClientContext, kfcs []kubeflow.KubeflowCom
 
 	for _, kfc := range kfcs {
 		for _, pod := range kfc.Unready {
-			tr := component.TableRow{
-				NAMESPACE: component.NewText(pod.Namespace),
-				NAME:      component.NewText(pod.Name),
-				AGE:       component.NewTimestamp(pod.CreationTimestamp.Time),
-				ACTION:    component.NewButton("Restart Pod", nil),
-			}
+			tr := unreadyTableRow(pod)
 			table.Add(tr)
 		}
 	}
@@ -118,4 +121,31 @@ func donutFromStatus(status kubeflow.Status, plural, singular string) component.
 	donut.SetSegments(segments)
 
 	return donut
+}
+
+func unreadyTableRow(pod v1.Pod) component.TableRow {
+	namespace := component.NewText(pod.Namespace)
+	name := component.NewText(pod.Name)
+	age := component.NewTimestamp(pod.CreationTimestamp.Time)
+
+	deleteAction := deletePodAction(pod.Namespace, pod.Name)
+	action := component.NewButton(KUBEFLOW_RESTART_POD, deleteAction)
+
+	return component.TableRow{
+		NAMESPACE: namespace,
+		NAME:      name,
+		AGE:       age,
+		ACTION:    action,
+	}
+}
+
+func deletePodAction(namespace, name string) action.Payload {
+	key := store.Key{
+		APIVersion: "v1",
+		Kind:       "Pod",
+		Namespace:  namespace,
+		Name:       name,
+	}
+
+	return action.CreatePayload(OCTANT_DELETE_OBJECT_ACTION, key.ToActionPayload())
 }
