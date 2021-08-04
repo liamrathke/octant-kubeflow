@@ -4,7 +4,6 @@ go 1.16
 
 require (
 	github.com/vmware-tanzu/octant v0.22.1-0.20210729190618-fc5ac32211c7
-	helm.sh/helm/v3 v3.4.2
 	k8s.io/api v0.21.3
 	k8s.io/apimachinery v0.21.3
 )
