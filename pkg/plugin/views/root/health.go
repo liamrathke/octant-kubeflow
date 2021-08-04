@@ -71,8 +71,8 @@ func BuildHealthView(cc utilities.ClientContext) (component.Component, error) {
 func buildServiceSection(cc utilities.ClientContext, kfcs []kubeflow.KubeflowComponent) component.FlexLayoutSection {
 	services := make(component.FlexLayoutSection, len(kfcs))
 	for index, kfc := range kfcs {
-		title := component.NewText(kfc.Name)
-		card := component.NewCard([]component.TitleComponent{title})
+		title := utilities.LinkToNamespace(kfc.Name, kfc.Namespace)
+		card := component.NewCard(component.Title(title))
 
 		cardLayout := component.NewFlexLayout(KUBEFLOW_SERVICES)
 		cardLayout.AddSections(component.FlexLayoutSection{
@@ -124,8 +124,8 @@ func donutFromStatus(status kubeflow.Status, plural, singular string) component.
 }
 
 func unreadyTableRow(pod v1.Pod) component.TableRow {
-	namespace := component.NewText(pod.Namespace)
-	name := component.NewText(pod.Name)
+	namespace := utilities.LinkToNamespace(pod.Namespace, pod.Namespace)
+	name := utilities.LinkToPod(pod.Name, pod.Namespace, pod.Name)
 	age := component.NewTimestamp(pod.CreationTimestamp.Time)
 
 	deleteAction := deletePodAction(pod.Namespace, pod.Name)
