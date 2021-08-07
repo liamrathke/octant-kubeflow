@@ -24,6 +24,14 @@ const (
 	INSTALLED
 )
 
+type Dependencies struct {
+	Checked   bool
+	Kustomize bool
+	Output    string
+	Errors    []string
+}
+
 type Installer struct {
-	Stage Stage
+	Stage        Stage
+	Dependencies Dependencies
 }

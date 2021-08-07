@@ -16,8 +16,82 @@ limitations under the License.
 
 package kubeflow // import "github.com/liamrathke/octant-kubeflow/pkg/kubeflow"
 
-import "github.com/liamrathke/octant-kubeflow/pkg/state"
+import (
+	"io"
+	"net/http"
+	"os"
+	"os/exec"
+	"path"
+
+	"github.com/liamrathke/octant-kubeflow/pkg/state"
+)
+
+const (
+	DOWNLOAD_PATH = "/tmp/octant-kubeflow"
+)
+
+const (
+	KUSTOMIZE_INSTALL_SCRIPT_URL      = "https://github.com/kubernetes-sigs/kustomize/blob/master/hack/install_kustomize.sh"
+	KUSTOMIZE_INSTALL_SCRIPT_FILENAME = "install_kustomize.sh"
+	KUSTOMIZE_VERSION                 = "3.2.0"
+)
 
 func Install() {
-	state.GetState().Installer.Stage = state.INSTALLING
+	var installer *state.Installer = &state.GetState().Installer
+	installer.Stage = state.INSTALLING
+
+	installer.Dependencies.Kustomize = isKustomizeInstalled()
+	installer.Dependencies.Checked = true
+
+	if !installer.Dependencies.Kustomize {
+		out, err := installKustomize()
+		if err != nil {
+			installer.Dependencies.Errors = []string{err.Error()}
+		} else {
+			installer.Dependencies.Kustomize = true
+			installer.Dependencies.Output = out
+		}
+	}
+
+}
+
+func isKustomizeInstalled() bool {
+	out, err := exec.Command("kustomize", "help").Output()
+	if err != nil {
+		return false
+	}
+
+	return out != nil
+}
+
+func installKustomize() (string, error) {
+	err := installKustomizeScript()
+	if err != nil {
+		return "", err
+	}
+
+	scriptPath := path.Join(DOWNLOAD_PATH, KUSTOMIZE_INSTALL_SCRIPT_FILENAME)
+	out, err := exec.Command(scriptPath, KUSTOMIZE_VERSION).Output()
+
+	return string(out), err
+}
+
+func installKustomizeScript() error {
+	res, err := http.Get(KUSTOMIZE_INSTALL_SCRIPT_URL)
+	script := res.Body
+	defer script.Close()
+	if err != nil {
+		return err
+	}
+
+	filePath := path.Join(DOWNLOAD_PATH, KUSTOMIZE_INSTALL_SCRIPT_FILENAME)
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(file, script)
+	file.Close()
+
+	return err
 }

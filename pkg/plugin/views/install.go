@@ -28,8 +28,6 @@ import (
 )
 
 func BuildInstallViewForCC(cc utilities.ClientContext) (component.Component, error) {
-	// cc := utilities.ClientContext{Client: request.DashboardClient(), Context: request.Context()}
-
 	switch state.GetState().Installer.Stage {
 	case state.NOT_INSTALLED:
 		return buildNotInstalledView(cc)
@@ -58,6 +56,18 @@ func buildNotInstalledView(cc utilities.ClientContext) (component.Component, err
 }
 
 func buildInstallingView(cc utilities.ClientContext) (component.Component, error) {
+	dependencyText := component.NewText("Dependencies")
+	dependencies := component.NewCard(component.Title(dependencyText))
+	dependencyLayout := component.NewFlexLayout("")
+
+	if !state.GetState().Installer.Dependencies.Checked {
+		dependencyLayout.AddSections(component.FlexLayoutSection{
+			{Width: component.WidthFull, View: component.NewText("Checking dependencies...")},
+		})
+	}
+
+	dependencies.SetBody(dependencyLayout)
+
 	text := component.NewText("Installing Kubeflow!")
 	return text, nil
 }
