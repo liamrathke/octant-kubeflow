@@ -22,6 +22,7 @@ import (
 	"github.com/liamrathke/octant-kubeflow/pkg/markdown"
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/actions"
 	"github.com/liamrathke/octant-kubeflow/pkg/plugin/utilities"
+	"github.com/liamrathke/octant-kubeflow/pkg/plugin/views/install"
 	"github.com/liamrathke/octant-kubeflow/pkg/state"
 	"github.com/vmware-tanzu/octant/pkg/action"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
@@ -56,18 +57,16 @@ func buildNotInstalledView(cc utilities.ClientContext) (component.Component, err
 }
 
 func buildInstallingView(cc utilities.ClientContext) (component.Component, error) {
-	dependencyText := component.NewText("Dependencies")
-	dependencies := component.NewCard(component.Title(dependencyText))
-	dependencyLayout := component.NewFlexLayout("")
+	dependencies, err := install.BuildDependencyCard(cc)
 
-	if !state.GetState().Installer.Dependencies.Checked {
-		dependencyLayout.AddSections(component.FlexLayoutSection{
-			{Width: component.WidthFull, View: component.NewText("Checking dependencies...")},
-		})
+	if err != nil {
+		return nil, err
 	}
 
-	dependencies.SetBody(dependencyLayout)
+	layout := component.NewFlexLayout("Installing Kubeflow")
+	layout.AddSections(component.FlexLayoutSection{
+		{Width: component.WidthFull, View: dependencies},
+	})
 
-	text := component.NewText("Installing Kubeflow!")
-	return text, nil
+	return layout, err
 }

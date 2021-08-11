@@ -46,7 +46,7 @@ func Install() {
 	if !installer.Dependencies.Kustomize {
 		out, err := installKustomize()
 		if err != nil {
-			installer.Dependencies.Errors = []string{err.Error()}
+			installer.Dependencies.Errors = err.Error()
 		} else {
 			installer.Dependencies.Kustomize = true
 			installer.Dependencies.Output = out

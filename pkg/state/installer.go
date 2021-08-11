@@ -28,7 +28,7 @@ type Dependencies struct {
 	Checked   bool
 	Kustomize bool
 	Output    string
-	Errors    []string
+	Errors    string
 }
 
 type Installer struct {
