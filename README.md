@@ -4,7 +4,7 @@
 
 <img width="960" alt="Presentation1" src="https://user-images.githubusercontent.com/33555592/129067635-86bd36ac-1d20-4280-b473-f487213f1ac8.png">
 
-An open-source Octant plugin that helps machine learning (ML) engineers debug and maintain their Kubeflow workloads, without relying on a Kubernetes background. 
+An open-source Octant plugin that helps machine learning engineers debug and maintain their Kubeflow workloads, without relying on a Kubernetes background. 
 
 ## Features
 
@@ -18,6 +18,15 @@ An open-source Octant plugin that helps machine learning (ML) engineers debug an
 ### Under Development
 
 - ⚠️ **Installer**: Add Kubeflow to an existing Kubernetes cluster with a single click
+
+## Install
+
+Run the following commands to download the repo and build the plugin for your own OS; the binary will then be copied to the default Octant plugin directory. Restart Octant to finish the installation.
+
+```
+git clone https://github.com/liamrathke/octant-kubeflow.git
+make build
+```
 
 ## Uninstall
 
