@@ -35,17 +35,31 @@ func BuildDependencyCard(cc utilities.ClientContext) (component.Component, error
 
 	dependencyState := state.GetState().Installer.Dependencies
 
-	if dependencyState.Checked {
+	if !dependencyState.Checked {
 		layout.AddSections(component.FlexLayoutSection{
 			{Width: component.WidthFull, View: component.NewText("Checking dependencies...")},
 		})
-	} else {
-		output := dependencyState.Output
-		outputMarkdown := component.NewMarkdownText(fmt.Sprintf(OUTPUT_TEMPLATE, output))
+		dependencies.SetBody(layout)
+		return dependencies, nil
+	}
+
+	if !dependencyState.Kustomize {
+		installKustomizePrompt := component.NewText("Kustomize 3.2.0 is required to install Kubeflow. Install now?")
+		installKustomizeButton := component.NewButton("Install Kustomize 3.2.0", nil)
+
 		layout.AddSections(component.FlexLayoutSection{
-			{Width: component.WidthFull, View: outputMarkdown},
+			{Width: 2 * component.WidthThird, View: installKustomizePrompt},
+			{Width: component.WidthThird, View: installKustomizeButton},
 		})
 	}
+
+	output := dependencyState.Output
+	outputMarkdown := component.NewMarkdownText(fmt.Sprintf(OUTPUT_TEMPLATE, output))
+	layout.AddSections(component.FlexLayoutSection{
+		{Width: component.WidthFull, View: outputMarkdown},
+	})
+
+	dependencies.SetBody(layout)
 
 	return dependencies, nil
 }
